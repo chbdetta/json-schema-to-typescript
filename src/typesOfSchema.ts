@@ -31,6 +31,10 @@ export function typesOfSchema(schema: JSONSchema): readonly [SchemaType, ...Sche
   return matchedTypes as [SchemaType, ...SchemaType[]]
 }
 
+const IS_SCHEMA = (schema: JSONSchema): boolean =>
+  // TODO: handle dependencies
+  'patternProperties' in schema || 'properties' in schema || 'required' in schema
+
 const matchers: Record<SchemaType, (schema: JSONSchema) => boolean> = {
   ALL_OF(schema) {
     return 'allOf' in schema
@@ -65,7 +69,7 @@ const matchers: Record<SchemaType, (schema: JSONSchema) => boolean> = {
     return 'enum' in schema && 'tsEnumNames' in schema
   },
   NAMED_SCHEMA(schema) {
-    return 'id' in schema && ('patternProperties' in schema || 'properties' in schema)
+    return IS_SCHEMA(schema) && 'id' in schema
   },
   NULL(schema) {
     return schema.type === 'null'
@@ -136,8 +140,8 @@ const matchers: Record<SchemaType, (schema: JSONSchema) => boolean> = {
     }
     return 'enum' in schema
   },
-  UNNAMED_SCHEMA() {
-    return false // Explicitly handled as the default case
+  UNNAMED_SCHEMA(schema) {
+    return IS_SCHEMA(schema) && !('id' in schema)
   },
   UNTYPED_ARRAY(schema) {
     return schema.type === 'array' && !('items' in schema)
