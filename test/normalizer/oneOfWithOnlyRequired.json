@@ -1,0 +1,53 @@
+{
+  "name": "normalize oneOf child with only the required key into properties and required",
+  "in": {
+    "type": "object",
+    "properties": {
+      "foo": {
+        "oneOf": [
+          {
+            "required": ["a"]
+          },
+          {
+            "required": ["b"]
+          }
+        ],
+        "properties": {
+          "a": {"type": "string"},
+          "b": {"type": "string"}
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "out": {
+    "id": "OneOfWithOnlyRequired",
+    "type": "object",
+    "properties": {
+      "foo": {
+        "oneOf": [
+          {
+            "required": ["a"],
+            "properties": {
+              "a": {"type": "string"}
+            }
+          },
+          {
+            "required": ["b"],
+            "properties": {
+              "b": {"type": "string"}
+            }
+          }
+        ],
+        "properties": {
+          "a": {"type": "string"},
+          "b": {"type": "string"}
+        },
+        "additionalProperties": true,
+        "required": []
+      }
+    },
+    "additionalProperties": false,
+    "required": []
+  }
+}

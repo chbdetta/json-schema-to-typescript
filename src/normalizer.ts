@@ -145,6 +145,27 @@ rules.set('Transform const to singleton enum', schema => {
   }
 })
 
+// TODO: a more general solution might be referencing the parent schema instead of copying it
+// but that requires the parser to count the references and generate standalone type based on the count
+rules.set('Copy corresponding properties into anyOf/oneOf schema if it only has the required key', schema => {
+  if (schema.properties) {
+    const copyProps = (childSchema: LinkedJSONSchema) => {
+      if (Object.keys(childSchema).length === 1 && Array.isArray(childSchema.required)) {
+        childSchema.properties = childSchema.required.reduce((prev: Record<string, LinkedJSONSchema>, key) => {
+          if (key in schema.properties!) {
+            prev[key] = schema.properties![key]
+          }
+
+          return prev
+        }, {})
+      }
+    }
+
+    schema.anyOf?.forEach(copyProps)
+    schema.oneOf?.forEach(copyProps)
+  }
+})
+
 export function normalize(rootSchema: LinkedJSONSchema, filename: string, options: Options): NormalizedJSONSchema {
   rules.forEach(rule => traverse(rootSchema, schema => rule(schema, filename, options)))
   return rootSchema as NormalizedJSONSchema
