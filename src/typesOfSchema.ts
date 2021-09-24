@@ -33,7 +33,7 @@ export function typesOfSchema(schema: JSONSchema): readonly [SchemaType, ...Sche
 
 const IS_SCHEMA = (schema: JSONSchema): boolean =>
   // TODO: handle dependencies
-  'patternProperties' in schema || 'properties' in schema || 'required' in schema
+  'patternProperties' in schema || 'properties' in schema
 
 const matchers: Record<SchemaType, (schema: JSONSchema) => boolean> = {
   ALL_OF(schema) {
