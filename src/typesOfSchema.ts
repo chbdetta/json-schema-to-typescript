@@ -1,4 +1,4 @@
-import {isPlainObject} from 'lodash'
+import {isEmpty, isPlainObject} from 'lodash'
 import {isCompound, JSONSchema, SchemaType} from './types/JSONSchema'
 
 /**
@@ -65,7 +65,11 @@ const matchers: Record<SchemaType, (schema: JSONSchema) => boolean> = {
     return 'enum' in schema && 'tsEnumNames' in schema
   },
   NAMED_SCHEMA(schema) {
-    return 'id' in schema && ('patternProperties' in schema || 'properties' in schema)
+    return (
+      (schema.type === 'object' || typeof schema.type === 'undefined') &&
+      'id' in schema &&
+      ('patternProperties' in schema || 'properties' in schema || !isEmpty(schema.required))
+    )
   },
   NULL(schema) {
     return schema.type === 'null'
@@ -136,8 +140,12 @@ const matchers: Record<SchemaType, (schema: JSONSchema) => boolean> = {
     }
     return 'enum' in schema
   },
-  UNNAMED_SCHEMA() {
-    return false // Explicitly handled as the default case
+  UNNAMED_SCHEMA(schema) {
+    return (
+      (schema.type === 'object' || typeof schema.type === 'undefined') &&
+      !('id' in schema) &&
+      ('patternProperties' in schema || 'properties' in schema || !isEmpty(schema.required))
+    )
   },
   UNTYPED_ARRAY(schema) {
     return schema.type === 'array' && !('items' in schema)
