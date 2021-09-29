@@ -29,35 +29,5 @@ export const input = {
       }
     }
   },
-  definitions: {
-    foo: {
-      properties: {
-        a: {type: 'string'},
-        b: {type: 'integer'}
-      },
-      additionalProperties: false,
-      required: ['a']
-    },
-    bar: {
-      properties: {
-        a: {enum: ['a', 'b', 'c']},
-        bam: {
-          type: 'array',
-          items: {
-            anyOf: [
-              {
-                enum: ['wam']
-              }
-            ]
-          }
-        }
-      }
-    },
-    baz: {
-      properties: {
-        baz: {$ref: '#/definitions/bar'}
-      }
-    }
-  },
   additionalProperties: false
 }
