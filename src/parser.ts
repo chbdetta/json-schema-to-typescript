@@ -1,5 +1,5 @@
 import {JSONSchema4Type, JSONSchema4TypeName} from 'json-schema'
-import {findKey, includes, isPlainObject, map, memoize, omit} from 'lodash'
+import {difference, findKey, includes, isPlainObject, map, memoize, omit, keys} from 'lodash'
 import {format} from 'util'
 import {Options} from './'
 import {typesOfSchema} from './typesOfSchema'
@@ -381,6 +381,16 @@ via the \`patternProperty\` "${key}".`
       })
     )
   }
+
+  asts = asts.concat(
+    difference(schema.required, keys(schema.properties), keys(schema.patternProperties)).map(key => ({
+      ast: options.unknownAny ? T_UNKNOWN : T_ANY,
+      isPatternProperty: false,
+      isRequired: true,
+      isUnreachableDefinition: false,
+      keyName: key
+    }))
+  )
 
   if (options.unreachableDefinitions) {
     asts = asts.concat(
